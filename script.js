@@ -1,7 +1,7 @@
 const output = document.getElementById('output');
 const commandInput = document.getElementById('command-input');
 
-const apiKey = 'YOUR_SPOONACULAR_API_KEY';  // Replace with your Spoonacular API key
+const apiKey = 'd27fa5f1e4f2498998479c716d3f7679';  // Replace with your Spoonacular API key
 const apiUrl = 'https://api.spoonacular.com/recipes';
 
 let commandHistory = [];
@@ -23,7 +23,6 @@ const commands = {
         <div>- search [ingredient]: Search for recipes with a specific ingredient</div>
         <div>- random: Get a random recipe</div>
         <div>- clear: Clear the terminal screen</div>
-        <div>- set favorites: Start entering your favorite ingredients for recommendations</div>
     `,
     'clear': 'clear',
 };
@@ -40,47 +39,10 @@ const fetchRandomRecipe = async () => {
     return data.recipes[0];
 };
 
-const fetchRecipesByFavorites = async (favorites) => {
-    const responses = await Promise.all(favorites.map(ingredient => fetchRecipes(ingredient)));
-    let allRecipes = [];
-    responses.forEach(response => allRecipes = allRecipes.concat(response));
-    
-    // Remove duplicates and sort by popularity (assuming 'popularity' is available)
-    const uniqueRecipes = Array.from(new Set(allRecipes.map(a => a.id)))
-        .map(id => allRecipes.find(a => a.id === id))
-        .sort((a, b) => b.popularity - a.popularity);
-
-    return uniqueRecipes.slice(0, 5); // Top 5 recommendations
-};
-
-let favoriteIngredients = [];
-let isCollectingFavorites = false;
-
-const askForFavorites = () => {
-    output.innerHTML += `
-        <div>Please type your favorite ingredients one by one. Type <strong>done</strong> when finished.</div>
-    `;
-    isCollectingFavorites = true;
-};
-
 const handleUserInput = async (input) => {
     let response;
 
-    if (isCollectingFavorites) {
-        if (input === 'done') {
-            if (favoriteIngredients.length < 1) {
-                response = `<div class="error">Please add at least one favorite ingredient before finishing.</div>`;
-            } else {
-                isCollectingFavorites = false;
-                response = `<div>Your favorite ingredients are collected. Type <strong>random</strong> to get a recipe based on your ingredients or add more ingredients.</div>`;
-                favoriteIngredients = []; // Clear favorites after processing
-                askForFavorites(); // Re-initialize asking for favorites
-            }
-        } else {
-            favoriteIngredients.push(input);
-            response = `<div>Added "${input}" to your favorite ingredients (${favoriteIngredients.length}).</div>`;
-        }
-    } else if (input.startsWith('search ')) {
+    if (input.startsWith('search ')) {
         const ingredient = input.substring(7).trim();
         if (ingredient) {
             const recipes = await fetchRecipes(ingredient);
@@ -104,25 +66,6 @@ const handleUserInput = async (input) => {
             <div class="recipe-title">${recipe.title}</div>
             <div class="recipe-description">Instructions: ${recipe.instructions || 'No instructions available.'}</div>
         `;
-    } else if (input === 'set favorites') {
-        favoriteIngredients = [];
-        askForFavorites();
-        return;
-    } else if (input === 'recommend') {
-        if (favoriteIngredients.length < 1) {
-            response = `<div>Please add at least one favorite ingredient before getting recommendations.</div>`;
-        } else {
-            const recommendedRecipes = await fetchRecipesByFavorites(favoriteIngredients);
-            response = '<div>Recommended recipes based on your favorite ingredients:</div>';
-            recommendedRecipes.forEach(recipe => {
-                response += `
-                    <div class="recipe-title">${recipe.title}</div>
-                    <div class="recipe-description">Instructions: ${recipe.instructions || 'No instructions available.'}</div>
-                `;
-            });
-            // Reinitialize asking for favorites
-            askForFavorites();
-        }
     } else if (input === 'clear') {
         output.innerHTML = '';
         return;
