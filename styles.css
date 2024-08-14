@@ -1,0 +1,52 @@
+body {
+    background-color: #1d1f21;
+    color: #c5c8c6;
+    font-family: monospace;
+    margin: 0;
+    padding: 20px;
+}
+
+.output {
+    max-width: 800px;
+    margin: 0 auto;
+    padding-bottom: 10px;
+}
+
+.command-input {
+    width: 100%;
+    padding: 10px;
+    background-color: #282a2e;
+    color: #c5c8c6;
+    border: none;
+    font-family: monospace;
+    font-size: 16px;
+}
+
+.command-input:focus {
+    outline: none;
+}
+
+.welcome h1 {
+    color: #8abeb7;
+}
+
+.welcome p {
+    color: #c5c8c6;
+}
+
+.prompt {
+    color: #81a2be;
+}
+
+.recipe-title {
+    color: #b5bd68;
+}
+
+.recipe-description {
+    margin-top: 10px;
+    color: #c5c8c6;
+}
+
+.error {
+    color: #cc6666;
+}
