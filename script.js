@@ -1,7 +1,7 @@
 const output = document.getElementById('output');
 const commandInput = document.getElementById('command-input');
 
-const apiKey = API;  // Replace with your Spoonacular API key
+const apiKey = secrets.API;  // Replace with your Spoonacular API key
 const apiUrl = 'https://api.spoonacular.com/recipes';
 
 let commandHistory = [];
