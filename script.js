@@ -1,7 +1,7 @@
 const output = document.getElementById('output');
 const commandInput = document.getElementById('command-input');
 
-const apiKey = 'd27fa5f1e4f2498998479c716d3f7679';  // Replace with your Spoonacular API key
+const apiKey = 'YOUR_SPOONACULAR_API_KEY';  // Replace with your Spoonacular API key
 const apiUrl = 'https://api.spoonacular.com/recipes';
 
 let commandHistory = [];
@@ -22,7 +22,6 @@ const commands = {
         <div>Available commands:</div>
         <div>- search [ingredient]: Search for recipes with a specific ingredient</div>
         <div>- random: Get a random recipe</div>
-        <div>- show [recipe_name]: Show details for a specific recipe</div>
         <div>- clear: Clear the terminal screen</div>
     `,
     'clear': 'clear',
@@ -37,33 +36,6 @@ const fetchRecipes = async (query) => {
     } catch (error) {
         console.error("Error fetching recipes:", error);  // Debugging output
         return [];
-    }
-};
-
-const fetchRecipeById = async (id) => {
-    try {
-        const response = await fetch(`${apiUrl}/${id}/information?apiKey=${apiKey}`);
-        const data = await response.json();
-        console.log("Fetch Recipe By ID Response:", data);  // Debugging output
-        return data || null;
-    } catch (error) {
-        console.error("Error fetching recipe by ID:", error);  // Debugging output
-        return null;
-    }
-};
-
-const fetchRecipeByName = async (name) => {
-    try {
-        const recipes = await fetchRecipes(name);
-        const recipe = recipes.find(recipe => recipe.title.toLowerCase() === name.toLowerCase());
-        if (recipe) {
-            return await fetchRecipeById(recipe.id);
-        }
-        console.log("Fetch Recipe By Name Response:", recipe);  // Debugging output
-        return null;
-    } catch (error) {
-        console.error("Error fetching recipe by name:", error);  // Debugging output
-        return null;
     }
 };
 
@@ -109,21 +81,6 @@ const handleUserInput = async (input) => {
             `;
         } else {
             response = `<div class="error">Unable to fetch a random recipe.</div>`;
-        }
-    } else if (input.startsWith('show ')) {
-        const recipeName = input.substring(5).trim();
-        if (recipeName) {
-            const recipe = await fetchRecipeByName(recipeName);
-            if (recipe) {
-                response = `
-                    <div class="recipe-title">${recipe.title}</div>
-                    <div class="recipe-description">${recipe.instructions || 'No instructions available.'}</div>
-                `;
-            } else {
-                response = `<div class="error">No recipe found with the name: ${recipeName}</div>`;
-            }
-        } else {
-            response = `<div class="error">Please provide a recipe name to show.</div>`;
         }
     } else if (input === 'clear') {
         output.innerHTML = '';
