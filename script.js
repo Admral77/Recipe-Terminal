@@ -30,7 +30,7 @@ const commands = {
 
 const fetchRecipes = async (query) => {
     try {
-        const response = await fetch(`${apiUrl}/complexSearch?apiKey=${apiKey}&query=${query}`);
+        const response = await fetch(`${apiUrl}/complexSearch?apiKey=${apiKey}&query=${query}&number=5`);
         const data = await response.json();
         console.log("Fetch Recipes Response:", data);  // Debugging output
         return data.results || [];
@@ -40,12 +40,27 @@ const fetchRecipes = async (query) => {
     }
 };
 
+const fetchRecipeById = async (id) => {
+    try {
+        const response = await fetch(`${apiUrl}/${id}/information?apiKey=${apiKey}`);
+        const data = await response.json();
+        console.log("Fetch Recipe By ID Response:", data);  // Debugging output
+        return data || null;
+    } catch (error) {
+        console.error("Error fetching recipe by ID:", error);  // Debugging output
+        return null;
+    }
+};
+
 const fetchRecipeByName = async (name) => {
     try {
         const recipes = await fetchRecipes(name);
         const recipe = recipes.find(recipe => recipe.title.toLowerCase() === name.toLowerCase());
+        if (recipe) {
+            return await fetchRecipeById(recipe.id);
+        }
         console.log("Fetch Recipe By Name Response:", recipe);  // Debugging output
-        return recipe || null;
+        return null;
     } catch (error) {
         console.error("Error fetching recipe by name:", error);  // Debugging output
         return null;
