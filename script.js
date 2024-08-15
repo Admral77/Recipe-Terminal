@@ -28,15 +28,23 @@ const commands = {
 };
 
 const fetchRecipes = async (query) => {
-    const response = await fetch(`${apiUrl}/complexSearch?apiKey=${apiKey}&query=${query}`);
-    const data = await response.json();
-    return data.results;
+    try {
+        const response = await fetch(`${apiUrl}/complexSearch?apiKey=${apiKey}&query=${query}`);
+        const data = await response.json();
+        return data.results;
+    } catch (error) {
+        return [];
+    }
 };
 
 const fetchRandomRecipe = async () => {
-    const response = await fetch(`${apiUrl}/random?apiKey=${apiKey}`);
-    const data = await response.json();
-    return data.recipes[0];
+    try {
+        const response = await fetch(`${apiUrl}/random?apiKey=${apiKey}`);
+        const data = await response.json();
+        return data.recipes[0];
+    } catch (error) {
+        return null;
+    }
 };
 
 const handleUserInput = async (input) => {
@@ -62,10 +70,14 @@ const handleUserInput = async (input) => {
         }
     } else if (input === 'random') {
         const recipe = await fetchRandomRecipe();
-        response = `
-            <div class="recipe-title">${recipe.title}</div>
-            <div class="recipe-description">Instructions: ${recipe.instructions || 'No instructions available.'}</div>
-        `;
+        if (recipe) {
+            response = `
+                <div class="recipe-title">${recipe.title}</div>
+                <div class="recipe-description">Instructions: ${recipe.instructions || 'No instructions available.'}</div>
+            `;
+        } else {
+            response = `<div class="error">Unable to fetch a random recipe.</div>`;
+        }
     } else if (input === 'clear') {
         output.innerHTML = '';
         return;
@@ -85,6 +97,7 @@ const handleUserInput = async (input) => {
 
 commandInput.addEventListener('keydown', async function(event) {
     if (event.key === 'Enter') {
+        event.preventDefault(); // Prevent default form submission behavior
         const input = commandInput.value.trim().toLowerCase();
         await handleUserInput(input);
     }
