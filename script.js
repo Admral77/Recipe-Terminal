@@ -22,6 +22,7 @@ const commands = {
         <div>Available commands:</div>
         <div>- search [ingredient]: Search for recipes with a specific ingredient</div>
         <div>- random: Get a random recipe</div>
+        <div>- show [recipe_name]: Show details for a specific recipe</div>
         <div>- clear: Clear the terminal screen</div>
     `,
     'clear': 'clear',
@@ -34,6 +35,15 @@ const fetchRecipes = async (query) => {
         return data.results;
     } catch (error) {
         return [];
+    }
+};
+
+const fetchRecipeByName = async (name) => {
+    try {
+        const recipes = await fetchRecipes(name);
+        return recipes.find(recipe => recipe.title.toLowerCase() === name.toLowerCase()) || null;
+    } catch (error) {
+        return null;
     }
 };
 
@@ -77,6 +87,21 @@ const handleUserInput = async (input) => {
             `;
         } else {
             response = `<div class="error">Unable to fetch a random recipe.</div>`;
+        }
+    } else if (input.startsWith('show ')) {
+        const recipeName = input.substring(5).trim();
+        if (recipeName) {
+            const recipe = await fetchRecipeByName(recipeName);
+            if (recipe) {
+                response = `
+                    <div class="recipe-title">${recipe.title}</div>
+                    <div class="recipe-description">Instructions: ${recipe.instructions || 'No instructions available.'}</div>
+                `;
+            } else {
+                response = `<div class="error">No recipe found with the name: ${recipeName}</div>`;
+            }
+        } else {
+            response = `<div class="error">Please provide a recipe name to show.</div>`;
         }
     } else if (input === 'clear') {
         output.innerHTML = '';
