@@ -32,8 +32,10 @@ const fetchRecipes = async (query) => {
     try {
         const response = await fetch(`${apiUrl}/complexSearch?apiKey=${apiKey}&query=${query}`);
         const data = await response.json();
-        return data.results;
+        console.log("Fetch Recipes Response:", data);  // Debugging output
+        return data.results || [];
     } catch (error) {
+        console.error("Error fetching recipes:", error);  // Debugging output
         return [];
     }
 };
@@ -41,8 +43,11 @@ const fetchRecipes = async (query) => {
 const fetchRecipeByName = async (name) => {
     try {
         const recipes = await fetchRecipes(name);
-        return recipes.find(recipe => recipe.title.toLowerCase() === name.toLowerCase()) || null;
+        const recipe = recipes.find(recipe => recipe.title.toLowerCase() === name.toLowerCase());
+        console.log("Fetch Recipe By Name Response:", recipe);  // Debugging output
+        return recipe || null;
     } catch (error) {
+        console.error("Error fetching recipe by name:", error);  // Debugging output
         return null;
     }
 };
@@ -51,8 +56,10 @@ const fetchRandomRecipe = async () => {
     try {
         const response = await fetch(`${apiUrl}/random?apiKey=${apiKey}`);
         const data = await response.json();
-        return data.recipes[0];
+        console.log("Fetch Random Recipe Response:", data);  // Debugging output
+        return data.recipes ? data.recipes[0] : null;
     } catch (error) {
+        console.error("Error fetching random recipe:", error);  // Debugging output
         return null;
     }
 };
@@ -69,7 +76,7 @@ const handleUserInput = async (input) => {
                 recipes.forEach(recipe => {
                     response += `
                         <div class="recipe-title">${recipe.title}</div>
-                        <div class="recipe-description">Instructions: ${recipe.instructions || 'No instructions available.'}</div>
+                        <div class="recipe-description">${recipe.instructions || 'No instructions available.'}</div>
                     `;
                 });
             } else {
@@ -83,7 +90,7 @@ const handleUserInput = async (input) => {
         if (recipe) {
             response = `
                 <div class="recipe-title">${recipe.title}</div>
-                <div class="recipe-description">Instructions: ${recipe.instructions || 'No instructions available.'}</div>
+                <div class="recipe-description">${recipe.instructions || 'No instructions available.'}</div>
             `;
         } else {
             response = `<div class="error">Unable to fetch a random recipe.</div>`;
@@ -95,7 +102,7 @@ const handleUserInput = async (input) => {
             if (recipe) {
                 response = `
                     <div class="recipe-title">${recipe.title}</div>
-                    <div class="recipe-description">Instructions: ${recipe.instructions || 'No instructions available.'}</div>
+                    <div class="recipe-description">${recipe.instructions || 'No instructions available.'}</div>
                 `;
             } else {
                 response = `<div class="error">No recipe found with the name: ${recipeName}</div>`;
